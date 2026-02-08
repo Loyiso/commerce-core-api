@@ -1,0 +1,60 @@
+## Ignore Visual Studio temporary files, build results, and user-specific files
+.vs/
+.vscode/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+*.DotSettings.user
+
+## Build outputs
+bin/
+obj/
+**/bin/
+**/obj/
+Debug/
+Release/
+
+## ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+## Publish output
+publish/
+artifacts/
+
+## NuGet
+packages/
+.packages/
+*.nupkg
+project.lock.json
+
+## Rider
+.idea/
+
+## Resharper
+_ReSharper*/
+*.ReSharper*/
+
+## Rider caches
+.rider/
+
+## OS files
+.DS_Store
+
+## Logs
+*.log
+
+## Temporary files
+*.tmp
+*.temp
+
+## Database files
+*.mdf
+*.ldf
+
+## User secrets (if used)
+secrets.json
+
+## Dotnet tool and local settings
+/.dotnet/
+global.json
