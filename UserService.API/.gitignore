@@ -1,0 +1,42 @@
+# Build results
+bin/
+obj/
+Debug/
+Release/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.sln.iml
+
+# VS Code
+.vscode/
+
+# Local environment files
+appsettings.Development.json
+appsettings.Local.json
+
+# Runtime files
+*.dll
+*.exe
+*.pdb
+
+# NuGet
+.nuget/
+*.nupkg
+*.snupkg
+
+# IDEs
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.log
+*.tmp
