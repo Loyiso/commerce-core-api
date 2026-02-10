@@ -1,18 +1,18 @@
-name: Deploy IdentityService.API to Azure (identity-commerce)
+name: Deploy CatalogService.API to Azure (catalog-commerce)
 
 on:
   push:
     branches: [ "main" ]
     paths:
-      - "IdentityService.API/**"
-      - ".github/workflows/deploy-identity-commerce.yml"
+      - "CatalogService.API/**"
+      - ".github/workflows/deploy-catalog-commerce.yml"
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: identity-commerce
+  AZURE_WEBAPP_NAME: catalog-commerce
   DOTNET_VERSION: "9.0.x"
-  PROJECT_PATH: "IdentityService.API/IdentityService.API.csproj"
-  PUBLISH_DIR: "publish_identity"
+  PROJECT_PATH: "CatalogService.API/CatalogService.API.csproj"
+  PUBLISH_DIR: "publish_catalog"
 
 jobs:
   build-and-deploy:
@@ -40,5 +40,5 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_IDENTITY_COMMERCE }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_CATALOG_COMMERCE }}
           package: ${{ env.PUBLISH_DIR }}
