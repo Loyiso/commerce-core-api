@@ -1,0 +1,44 @@
+name: Deploy CartService.API to Azure (cart-commerce)
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "CartService.API/**"
+      - ".github/workflows/deploy-cart-commerce.yml"
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: cart-commerce
+  DOTNET_VERSION: "9.0.x"
+  PROJECT_PATH: "CartService.API/CartService.API.csproj"
+  PUBLISH_DIR: "publish_cart"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore ${{ env.PROJECT_PATH }}
+
+      - name: Build
+        run: dotnet build ${{ env.PROJECT_PATH }} -c Release --no-restore
+
+      - name: Publish
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release --no-build -o ${{ env.PUBLISH_DIR }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_CART_COMMERCE }}
+          package: ${{ env.PUBLISH_DIR }}
