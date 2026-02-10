@@ -1,12 +1,11 @@
 {
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "ApiGateway": {
+    "IdentityService.API": {
       "commandName": "Project",
       "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "launchUrl": "health",
-      "applicationUrl": "https://localhost:7000;http://localhost:5005",
+      "launchBrowser": false,
+      "applicationUrl": "http://localhost:5001",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
