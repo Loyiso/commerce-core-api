@@ -9,31 +9,29 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
  
 var jwtSection = builder.Configuration.GetSection("Jwt");
-var issuer = jwtSection["Issuer"]!;
-var audience = jwtSection["Audience"]!;
-var signingKey = jwtSection["SigningKey"]!;
+var issuer = jwtSection["Issuer"] ?? "IdentityService";
+var audience = jwtSection["Audience"] ?? "IdentityServiceClients";
+var signingKey = jwtSection["SigningKey"] ?? string.Empty;
+ 
+var isWeakKey =
+    string.IsNullOrWhiteSpace(signingKey) ||
+    signingKey.Contains("CHANGE_ME", StringComparison.OrdinalIgnoreCase) ||
+    signingKey.Length < 32;
 
-if (string.IsNullOrWhiteSpace(signingKey) || signingKey.Contains("CHANGE_ME", StringComparison.OrdinalIgnoreCase) || signingKey.Length < 32)
+if (isWeakKey && builder.Environment.IsProduction())
 {
-    // This is a dev-friendly safeguard to avoid accidentally running with a weak key.
-    // Update appsettings.json Jwt:SigningKey to a strong random secret.
-    builder.Logging.AddFilter("Microsoft.AspNetCore", LogLevel.Information);
+    throw new InvalidOperationException("Jwt:SigningKey is missing/weak. Set a strong secret (>= 32 chars).");
 }
-
-// --- Services
+ 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
-{
-    // In-memory DB for mock / local dev
-    opt.UseInMemoryDatabase("IdentityServiceDb");
-});
+    opt.UseInMemoryDatabase("IdentityServiceDb"));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
@@ -59,18 +57,18 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
-var app = builder.Build();
+var app = builder.Build(); 
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
-app.UseHttpsRedirection();
-
+ 
+app.MapGet("/", () => Results.Redirect("/swagger"));
+ 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+ 
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();

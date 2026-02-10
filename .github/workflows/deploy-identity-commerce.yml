@@ -1,11 +1,6 @@
 name: Deploy IdentityService.API to Azure (identity-commerce)
 
-on:
-  push:
-    branches: [ "main" ]
-    paths:
-      - "IdentityService.API/**"
-      - ".github/workflows/deploy-identity-commerce.yml"
+on: 
   workflow_dispatch:
 
 env:

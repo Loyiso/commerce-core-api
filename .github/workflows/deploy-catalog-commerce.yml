@@ -1,11 +1,6 @@
 name: Deploy CatalogService.API to Azure (catalog-commerce)
 
-on:
-  push:
-    branches: [ "main" ]
-    paths:
-      - "CatalogService.API/**"
-      - ".github/workflows/deploy-catalog-commerce.yml"
+on: 
   workflow_dispatch:
 
 env:
