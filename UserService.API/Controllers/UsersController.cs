@@ -8,12 +8,12 @@ namespace UserService.API.Controllers;
 [Route("users")]
 public class UsersController : ControllerBase
 {
-    private readonly IUserService _service;
+    private readonly IUserService _userService;
     private readonly ILogger<UsersController> _logger;
 
-    public UsersController(IUserService service, ILogger<UsersController> logger)
+    public UsersController(IUserService userService, ILogger<UsersController> logger)
     {
-        _service = service ?? throw new ArgumentNullException(nameof(service));
+        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -24,7 +24,7 @@ public class UsersController : ControllerBase
 
         try
         {
-            var result = await _service.GetAllAsync(ct);
+            var result = await _userService.GetAllAsync(ct);
             _logger.LogInformation("GET /users succeeded | Count: {Count}", result.Count);
             return Ok(result);
         }
@@ -42,7 +42,7 @@ public class UsersController : ControllerBase
 
         try
         {
-            var user = await _service.GetByIdAsync(id, ct);
+            var user = await _userService.GetByIdAsync(id, ct);
 
             if (user is null)
             {
@@ -67,7 +67,13 @@ public class UsersController : ControllerBase
 
         try
         {
-            var created = await _service.CreateAsync(request, ct);
+            if(request is null)
+            {
+                _logger.LogWarning("POST /users bad request | Request body is null");
+                return BadRequest("Request body cannot be null");
+            }
+
+            var created = await _userService.CreateAsync(request, ct);
 
             _logger.LogInformation("POST /users succeeded | Id: {Id} | Email: {Email}", created.Id, created.Email);
 
@@ -87,7 +93,7 @@ public class UsersController : ControllerBase
 
         try
         {
-            var updated = await _service.UpdateAsync(id, request, ct);
+            var updated = await _userService.UpdateAsync(id, request, ct);
 
             if (updated is null)
             {
@@ -112,7 +118,7 @@ public class UsersController : ControllerBase
 
         try
         {
-            var deleted = await _service.DeleteAsync(id, ct);
+            var deleted = await _userService.DeleteAsync(id, ct);
 
             if (!deleted)
             {
