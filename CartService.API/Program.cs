@@ -6,8 +6,17 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
+ 
+using Shared.Logging.Dispatch;
+using Shared.Logging.Extensions;
+using Shared.Logging.Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+ 
+builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning);
+builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+builder.Logging.AddFilter("Microsoft.AspNetCore.DataProtection", LogLevel.Warning);
  
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var issuer = jwtSection["Issuer"] ?? "IdentityService";
@@ -24,9 +33,28 @@ if (isWeakKey && builder.Environment.IsProduction())
     throw new InvalidOperationException("Jwt:SigningKey is missing/weak. Set a strong secret (>= 32 chars).");
 }
  
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddSharedInMemoryLogging(
+    databaseName: "CartServiceLogsDb"
+);
+
+builder.Host.UseSerilog((ctx, services, lc) =>
+{
+    var dispatcher = services.GetRequiredService<ILogDispatcher>();
+
+    lc.ReadFrom.Configuration(ctx.Configuration)
+      .Enrich.FromLogContext()
+      .WriteTo.Console()
+      .WriteTo.Sink(new FireAndForgetInMemorySink(
+          dispatcher,
+          service: "CartService.API",
+          environment: ctx.HostingEnvironment.EnvironmentName));
+});
+ 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-  
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "CartService.API", Version = "v1" });
@@ -73,7 +101,9 @@ builder.Services
             ValidAudience = audience,
 
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)),
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(signingKey)
+            ),
 
             ValidateLifetime = true,
             ClockSkew = TimeSpan.FromSeconds(30)
@@ -84,6 +114,8 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
  
+app.UseSerilogRequestLogging();
+ 
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<CartDbContext>();
@@ -92,9 +124,9 @@ using (var scope = app.Services.CreateScope())
  
 app.UseSwagger();
 app.UseSwaggerUI();
- 
+
 app.MapGet("/", () => Results.Redirect("/swagger"));
- 
+
 app.UseAuthentication();
 app.UseAuthorization();
 

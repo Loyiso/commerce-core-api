@@ -8,8 +8,7 @@ using Serilog.Events;
 using UserService.API.Data;
 using UserService.API.Repositories;
 using UserService.API.Services;
-
-// Shared logging
+ 
 using Shared.Logging.Dispatch;
 using Shared.Logging.Extensions;
 using Shared.Logging.Serilog;

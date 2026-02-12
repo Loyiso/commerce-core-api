@@ -10,7 +10,7 @@ async logging.
 
 `commerce-core-api` is a modular microservices backend built with:
 
--   .NET 8
+-   .NET 9
 -   Clean Architecture principles
 -   Ocelot API Gateway
 -   JWT Authentication
@@ -111,19 +111,7 @@ EF Core
 Non-blocking and async.
 
 ------------------------------------------------------------------------
-
-# 🚀 Roadmap
-
--   SQL Server integration
--   Docker & Docker Compose
--   Health checks
--   OpenTelemetry
--   CI/CD pipeline
--   Redis caching
--   Multi-tenant SaaS capabilities
-
-------------------------------------------------------------------------
-
+  
 # 👨‍💻 Author
 
 **Loyiso Nelani**\

@@ -1,0 +1,32 @@
+## Ignore build outputs
+bin/
+obj/
+
+## Visual Studio, VS Code, Rider
+.vs/
+.vscode/
+.idea/
+
+## User-specific files
+*.user
+*.suo
+
+## .NET / NuGet
+project.assets.json
+*.nupkg
+packages/
+artifacts/
+
+## Build configs / logs
+*.log
+
+## Launch settings (machine-specific)
+Properties/launchSettings.json
+
+## Local appsettings (may contain secrets)
+appsettings.*.json
+
+## NuGet generated files
+*.nuget.props
+*.nuget.g.props
+*.nuget.g.targets
