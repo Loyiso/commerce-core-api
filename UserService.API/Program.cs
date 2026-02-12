@@ -3,12 +3,23 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using UserService.API.Data;
 using UserService.API.Repositories;
 using UserService.API.Services;
 
+// Shared logging  
+using Shared.Logging.Dispatch;
+using Shared.Logging.Extensions;
+using Shared.Logging.Serilog;
+
 var builder = WebApplication.CreateBuilder(args);
- 
+
+builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning);
+builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+builder.Logging.AddFilter("Microsoft.AspNetCore.DataProtection", LogLevel.Warning);
+
+// ---- JWT
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var issuer = jwtSection["Issuer"] ?? "IdentityService";
 var audience = jwtSection["Audience"] ?? "IdentityServiceClients";
@@ -24,9 +35,27 @@ if (isWeakKey && builder.Environment.IsProduction())
     throw new InvalidOperationException("Jwt:SigningKey is missing/weak. Set a strong secret (>= 32 chars).");
 }
  
+builder.Services.AddHttpContextAccessor();
+ 
+builder.Services.AddSharedInMemoryLogging(databaseName: "UserServiceLogsDb");
+ 
+builder.Host.UseSerilog((ctx, services, lc) =>
+{
+    var dispatcher = services.GetRequiredService<ILogDispatcher>();
+
+    lc.ReadFrom.Configuration(ctx.Configuration)
+      .Enrich.FromLogContext()
+      .WriteTo.Console()
+      .WriteTo.Sink(new FireAndForgetInMemorySink(
+          dispatcher,
+          service: "UserService.API",
+          environment: ctx.HostingEnvironment.EnvironmentName));
+});
+
+// ---- Services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
- 
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "UserService.API", Version = "v1" });
@@ -84,17 +113,19 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
  
+app.UseSerilogRequestLogging();
+ 
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<UsersDbContext>();
     DbSeeder.Seed(db);
 }
-
+ 
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.MapGet("/", () => Results.Redirect("/swagger"));
- 
+
 app.UseAuthentication();
 app.UseAuthorization();
 
