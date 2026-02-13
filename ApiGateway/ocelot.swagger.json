@@ -1,0 +1,44 @@
+{
+  "SwaggerEndPoints": [
+    {
+      "Key": "catalog",
+      "Config": [
+        {
+          "Name": "CatalogService",
+          "Version": "v1",
+          "Url": "http://localhost:5101/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "cart",
+      "Config": [
+        {
+          "Name": "CartService",
+          "Version": "v1",
+          "Url": "http://localhost:5102/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "users",
+      "Config": [
+        {
+          "Name": "UserService",
+          "Version": "v1",
+          "Url": "http://localhost:5103/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "identity",
+      "Config": [
+        {
+          "Name": "IdentityService",
+          "Version": "v1",
+          "Url": "http://localhost:5100/swagger/v1/swagger.json"
+        }
+      ]
+    }
+  ]
+}

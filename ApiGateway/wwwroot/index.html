@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Commerce API Gateway</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#0f1a30;
+      --text:#eaf0ff;
+      --muted:#a9b6d3;
+      --line:rgba(255,255,255,.08);
+      --accent:#5eead4;
+      --accent2:#60a5fa;
+      --shadow: 0 12px 40px rgba(0,0,0,.35);
+      --radius:18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 20% 10%, rgba(96,165,250,.25), transparent 60%),
+        radial-gradient(800px 500px at 80% 20%, rgba(94,234,212,.22), transparent 60%),
+        radial-gradient(700px 450px at 50% 85%, rgba(167,139,250,.18), transparent 60%),
+        var(--bg);
+      min-height:100vh;
+    }
+    .container{
+      max-width:1100px;
+      margin:0 auto;
+      padding:42px 18px 60px;
+    }
+    header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+      margin-bottom:28px;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      border-radius:999px;
+      font-family:var(--mono);
+      font-size:12px;
+      color:var(--muted);
+      backdrop-filter: blur(6px);
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      box-shadow:0 0 0 4px rgba(94,234,212,.08);
+    }
+    h1{
+      margin:10px 0 10px;
+      font-size:40px;
+      letter-spacing:-.02em;
+      line-height:1.1;
+    }
+    p.lead{
+      margin:0;
+      color:var(--muted);
+      max-width:740px;
+      font-size:16px;
+      line-height:1.6;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:16px;
+      margin-top:24px;
+    }
+    .card{
+      grid-column: span 6;
+      background: rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:18px;
+      backdrop-filter: blur(8px);
+    }
+    .card.wide{ grid-column: span 12; }
+    .card h2{
+      margin:0 0 10px;
+      font-size:16px;
+      letter-spacing:-.01em;
+    }
+    .card p{
+      margin:0 0 14px;
+      color:var(--muted);
+      line-height:1.6;
+      font-size:14px;
+    }
+    .links{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    a.btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      text-decoration:none;
+      color:var(--text);
+      background:rgba(255,255,255,.03);
+      transition:.18s ease;
+      font-size:14px;
+    }
+    a.btn:hover{
+      transform: translateY(-1px);
+      border-color: rgba(94,234,212,.35);
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    code, .pill{
+      font-family:var(--mono);
+      font-size:12px;
+    }
+    .pill{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--muted);
+      margin-right:8px;
+      margin-bottom:8px;
+    }
+    .table{
+      width:100%;
+      border-collapse: collapse;
+      overflow:hidden;
+      border-radius:14px;
+      border:1px solid var(--line);
+    }
+    .table th, .table td{
+      padding:12px 12px;
+      border-bottom:1px solid var(--line);
+      text-align:left;
+      font-size:14px;
+    }
+    .table th{
+      color:#d7e3ff;
+      background: rgba(255,255,255,.03);
+      font-weight:600;
+    }
+    .table td{
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+    .footer{
+      margin-top:26px;
+      color:rgba(169,182,211,.8);
+      font-size:12px;
+      font-family:var(--mono);
+      display:flex;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      gap:12px;
+    }
+    @media (max-width:860px){
+      .card{ grid-column: span 12; }
+      h1{ font-size:32px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <div class="badge"><span class="dot"></span> Commerce API Gateway</div>
+        <h1>Gateway & Routing</h1>
+        <p class="lead">
+          Lightweight Ocelot gateway for the Commerce microservices.  
+          Use it for routing, resiliency (Polly), and a single entry point — while each service hosts its own Swagger UI.
+        </p>
+      </div>
+      <div class="badge">Environment: <span id="env">local</span></div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Quick Links</h2>
+        <p>Health check and service documentation.</p>
+        <div class="links">
+          <a class="btn" href="/health">/health</a>
+
+          <!-- Update these to your real service URLs (local ports or Azure URLs) -->
+          <a class="btn" href="http://localhost:5001/swagger" target="_blank" rel="noreferrer">UserService Swagger</a>
+          <a class="btn" href="http://localhost:5002/swagger" target="_blank" rel="noreferrer">CartService Swagger</a>
+          <a class="btn" href="http://localhost:5003/swagger" target="_blank" rel="noreferrer">CatalogService Swagger</a>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Gateway Routes</h2>
+        <p>Examples of what the gateway typically exposes (based on your <code>ocelot.json</code>).</p>
+        <div>
+          <span class="pill">GET /users</span>
+          <span class="pill">GET /users/{id}</span>
+          <span class="pill">GET /carts</span>
+          <span class="pill">GET /products</span>
+        </div>
+      </section>
+
+      <section class="card wide">
+        <h2>How to Use</h2>
+        <p>Use the gateway as your single entry point for the front-end / clients.</p>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Request</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Health Check</td>
+              <td>GET /health</td>
+            </tr>
+            <tr>
+              <td>Call UserService via Gateway</td>
+              <td>GET /users</td>
+            </tr>
+            <tr>
+              <td>Call CartService via Gateway</td>
+              <td>GET /carts</td>
+            </tr>
+            <tr>
+              <td>Call CatalogService via Gateway</td>
+              <td>GET /products</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+
+    <div class="footer">
+      <div>Tip: keep gateway lean (routing/resilience), docs live on services.</div>
+      <div id="time"></div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("time").textContent = "Updated: " + new Date().toLocaleString();
+  </script>
+</body>
+</html>
