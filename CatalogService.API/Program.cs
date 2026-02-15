@@ -7,24 +7,17 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
-
-// Shared logging
+ 
 using Shared.Logging.Dispatch;
 using Shared.Logging.Extensions;
 using Shared.Logging.Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
-
-//
-// Reduce noisy Microsoft logs
-//
+ 
 builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning);
 builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
 builder.Logging.AddFilter("Microsoft.AspNetCore.DataProtection", LogLevel.Warning);
-
-//
-// ---- JWT
-//
+ 
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var issuer = jwtSection["Issuer"] ?? "IdentityService";
 var audience = jwtSection["Audience"] ?? "IdentityServiceClients";
@@ -39,10 +32,7 @@ if (isWeakKey && builder.Environment.IsProduction())
 {
     throw new InvalidOperationException("Jwt:SigningKey is missing/weak. Set a strong secret (>= 32 chars).");
 }
-
-//
-// ---- Shared Logging (EF InMemory + Async Dispatcher)
-//
+ 
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSharedInMemoryLogging(databaseName: "CatalogServiceLogsDb");
@@ -59,10 +49,7 @@ builder.Host.UseSerilog((ctx, services, lc) =>
           service: "CatalogService.API",
           environment: ctx.HostingEnvironment.EnvironmentName));
 });
-
-//
-// ---- API
-//
+ 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -96,24 +83,15 @@ builder.Services
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
-
-//
-// ---- Serilog HTTP Request Logging
-//
+ 
 app.UseSerilogRequestLogging();
-
-//
-// ---- Seed
-//
+ 
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     SeedData.Seed(db);
 }
-
-//
-// ---- Middleware
-//
+ 
 app.UseSwagger();
 app.UseSwaggerUI();
 

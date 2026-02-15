@@ -1,0 +1,25 @@
+# Build results
+bin/
+obj/
+
+# Visual Studio cache/options
+.vs/
+.vscode/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local environment files
+appsettings.local.json
+*.local.json
+
+# Logs
+Logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
