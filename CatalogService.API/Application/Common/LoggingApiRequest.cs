@@ -1,4 +1,4 @@
-namespace CatalogService.API.Infrastructure;
+namespace CatalogService.API.Application.Common;
 
 public sealed class LoggingApiRequest
 {

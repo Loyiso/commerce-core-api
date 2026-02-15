@@ -1,16 +1,17 @@
-
+using CatalogService.API.Application.Common;
 using CatalogService.API.Application.DTOs;
 
 namespace CatalogService.API.Application.Interfaces;
 
 public interface IProductService
 {
-    Task<IEnumerable<ProductDto>> GetAsync(
+    Task<PagedResult<ProductDto>> GetAsync(
         string? search,
         string? sortBy,
         bool desc,
         int page,
-        int pageSize);
+        int pageSize,
+        CancellationToken ct = default);
 
-    Task<ProductDto?> GetByIdAsync(Guid id);
+    Task<ProductDto?> GetByIdAsync(Guid id, CancellationToken ct = default);
 }

@@ -6,6 +6,7 @@ using CatalogService.API.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens; 
+using CatalogService.API.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,10 +66,8 @@ builder.Services
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
- 
-app.UseSerilogRequestLogging();
- 
-using (var scope = app.Services.CreateScope())
+   
+using (var scope = app.Services.CreateScope()) 
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     SeedData.Seed(db);
