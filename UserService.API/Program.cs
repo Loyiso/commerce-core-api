@@ -2,22 +2,18 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using Serilog;
-using Serilog.Events;
+using Microsoft.OpenApi.Models; 
 using UserService.API.Data;
 using UserService.API.Repositories;
 using UserService.API.Services;
  
-using Shared.Logging.Dispatch;
-using Shared.Logging.Extensions;
-using Shared.Logging.Serilog;
-
 var builder = WebApplication.CreateBuilder(args);
  
-builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning);
-builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
-builder.Logging.AddFilter("Microsoft.AspNetCore.DataProtection", LogLevel.Warning);
+builder.Services.AddHttpClient<ILoggingApiClient, LoggingApiClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["LoggingApi:BaseUrl"]!);
+    client.Timeout = TimeSpan.FromSeconds(2);  
+});
  
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var issuer = jwtSection["Issuer"] ?? "IdentityService";
@@ -35,25 +31,7 @@ if (isWeakKey && builder.Environment.IsProduction())
 }
 
 builder.Services.AddHttpContextAccessor();
- 
-builder.Services.AddSharedInMemoryLogging(databaseName: "UserServiceLogsDb");
- 
-builder.Host.UseSerilog((ctx, services, lc) =>
-{
-    var dispatcher = services.GetRequiredService<ILogDispatcher>();
-
-    lc.ReadFrom.Configuration(ctx.Configuration)
-      .Enrich.FromLogContext() 
-      .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Error)
-      .MinimumLevel.Override("Shared.Logging", LogEventLevel.Warning)
-
-      .WriteTo.Console()
-      .WriteTo.Sink(new FireAndForgetInMemorySink(
-          dispatcher,
-          service: "UserService.API",
-          environment: ctx.HostingEnvironment.EnvironmentName));
-});
- 
+   
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -113,9 +91,7 @@ builder.Services
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
-
-app.UseSerilogRequestLogging();
- 
+  
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<UsersDbContext>();

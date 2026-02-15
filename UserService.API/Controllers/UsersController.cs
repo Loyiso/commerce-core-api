@@ -8,131 +8,179 @@ namespace UserService.API.Controllers;
 [Route("users")]
 public class UsersController : ControllerBase
 {
-    private readonly IUserService _userService;
-    private readonly ILogger<UsersController> _logger;
+    private readonly IUserService _userService; 
+    private readonly ILoggingApiClient _loggingApi;
 
-    public UsersController(IUserService userService, ILogger<UsersController> logger)
+    public UsersController(
+        IUserService userService, 
+        ILoggingApiClient loggingApi)
     {
-        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _userService = userService ?? throw new ArgumentNullException(nameof(userService)); 
+        _loggingApi = loggingApi ?? throw new ArgumentNullException(nameof(loggingApi));
     }
 
     [HttpGet]
     public async Task<ActionResult<List<UserResponse>>> GetAll(CancellationToken ct)
-    {
-        _logger.LogInformation("GET /users started");
+    { 
+        FireAndForgetLog("Information", "GET /users started");
 
         try
         {
             var result = await _userService.GetAllAsync(ct);
-            _logger.LogInformation("GET /users succeeded | Count: {Count}", result.Count);
+ 
+            FireAndForgetLog("Information", "GET /users succeeded", new()
+            {
+                ["Count"] = result.Count
+            });
+
             return Ok(result);
         }
         catch (Exception ex)
-        {
-            _logger.LogError(ex, "GET /users failed");
+        {  
+            FireAndForgetLog("Error", "GET /users failed", new()
+            {
+                ["Error"] = ex.Message
+            }, ex);
+
             return StatusCode(500, "Internal server error");
         }
     }
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<UserResponse>> GetById(Guid id, CancellationToken ct)
-    {
-        _logger.LogInformation("GET /users/{Id} started", id);
+    { 
+        FireAndForgetLog("Information", "GET /users/{Id} started", new() { ["Id"] = id });
 
         try
         {
             var user = await _userService.GetByIdAsync(id, ct);
 
             if (user is null)
-            {
-                _logger.LogWarning("GET /users/{Id} not found", id);
+            { 
+                FireAndForgetLog("Warning", "GET /users/{Id} not found", new() { ["Id"] = id });
                 return NotFound();
             }
+ 
+            FireAndForgetLog("Information", "GET /users/{Id} succeeded", new() { ["Id"] = id });
 
-            _logger.LogInformation("GET /users/{Id} succeeded", id);
             return Ok(user);
         }
         catch (Exception ex)
-        {
-            _logger.LogError(ex, "GET /users/{Id} failed", id);
+        { 
+            FireAndForgetLog("Error", "GET /users/{Id} failed", new() { ["Id"] = id }, ex);
             return StatusCode(500, "Internal server error");
         }
     }
 
     [HttpPost]
     public async Task<ActionResult<UserResponse>> Create([FromBody] UserCreateRequest request, CancellationToken ct)
-    {
-        _logger.LogInformation("POST /users started | Email: {Email}", request?.Email);
+    { 
+        FireAndForgetLog("Information", "POST /users started", new() { ["Email"] = request?.Email });
 
         try
         {
-            if(request is null)
-            {
-                _logger.LogWarning("POST /users bad request | Request body is null");
+            if (request is null)
+            { 
+                FireAndForgetLog("Warning", "POST /users bad request | Request body is null");
                 return BadRequest("Request body cannot be null");
             }
 
             var created = await _userService.CreateAsync(request, ct);
-
-            _logger.LogInformation("POST /users succeeded | Id: {Id} | Email: {Email}", created.Id, created.Email);
+ 
+            FireAndForgetLog("Information", "POST /users succeeded", new()
+            {
+                ["Id"] = created.Id,
+                ["Email"] = created.Email
+            });
 
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
         catch (Exception ex)
-        {
-            _logger.LogError(ex, "POST /users failed | Email: {Email}", request?.Email);
+        { 
+            FireAndForgetLog("Error", "POST /users failed", new() { ["Email"] = request?.Email }, ex);
             return StatusCode(500, "Internal server error");
         }
     }
 
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<UserResponse>> Update(Guid id, [FromBody] UserUpdateRequest request, CancellationToken ct)
-    {
-        _logger.LogInformation("PUT /users/{Id} started", id);
+    { 
+        FireAndForgetLog("Information", "PUT /users/{Id} started", new() { ["Id"] = id });
 
         try
         {
             var updated = await _userService.UpdateAsync(id, request, ct);
 
             if (updated is null)
-            {
-                _logger.LogWarning("PUT /users/{Id} not found", id);
+            { 
+                FireAndForgetLog("Warning", "PUT /users/{Id} not found", new() { ["Id"] = id });
                 return NotFound();
             }
+ 
+            FireAndForgetLog("Information", "PUT /users/{Id} succeeded", new() { ["Id"] = id });
 
-            _logger.LogInformation("PUT /users/{Id} succeeded", id);
             return Ok(updated);
         }
         catch (Exception ex)
-        {
-            _logger.LogError(ex, "PUT /users/{Id} failed", id);
+        { 
+            FireAndForgetLog("Error", "PUT /users/{Id} failed", new() { ["Id"] = id }, ex);
             return StatusCode(500, "Internal server error");
         }
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
-    {
-        _logger.LogInformation("DELETE /users/{Id} started", id);
+    { 
+        FireAndForgetLog("Information", "DELETE /users/{Id} started", new() { ["Id"] = id });
 
         try
         {
             var deleted = await _userService.DeleteAsync(id, ct);
 
             if (!deleted)
-            {
-                _logger.LogWarning("DELETE /users/{Id} not found", id);
+            { 
+                FireAndForgetLog("Warning", "DELETE /users/{Id} not found", new() { ["Id"] = id });
                 return NotFound();
             }
+ 
+            FireAndForgetLog("Information", "DELETE /users/{Id} succeeded", new() { ["Id"] = id });
 
-            _logger.LogInformation("DELETE /users/{Id} succeeded", id);
             return NoContent();
         }
         catch (Exception ex)
-        {
-            _logger.LogError(ex, "DELETE /users/{Id} failed", id);
+        { 
+            FireAndForgetLog("Error", "DELETE /users/{Id} failed", new() { ["Id"] = id }, ex);
             return StatusCode(500, "Internal server error");
         }
+    }
+
+    private void FireAndForgetLog(
+        string level,
+        string message,
+        Dictionary<string, object?>? props = null,
+        Exception? ex = null)
+    {
+        // Capture what you need NOW; never touch HttpContext inside the Task later.
+        var traceId = HttpContext.TraceIdentifier;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await _loggingApi.LogAsync(new LoggingApiRequest
+                {
+                    Service = "UserService.API",
+                    Level = level,
+                    Message = message,
+                    TraceId = traceId,
+                    Exception = ex?.ToString(),
+                    Properties = props ?? new Dictionary<string, object?>()
+                });
+            }
+            catch
+            {
+                // Swallow: logging must never break requests.
+            }
+        });
     }
 }

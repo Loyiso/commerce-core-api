@@ -30,14 +30,12 @@ builder.Services.AddScoped<ILogService, LogService>();
 var app = builder.Build();
 
 app.UseSerilogRequestLogging();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+ 
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok", service = "logging-service" }));
+app.MapGet("/", () => Results.Redirect("/swagger"));
 
 app.UseHttpsRedirection();
 app.MapControllers();
