@@ -7,6 +7,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddHttpClient<ILoggingApiClient, LoggingApiClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["LoggingApi:BaseUrl"]!);
+    client.Timeout = TimeSpan.FromSeconds(2);  
+});
  
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var issuer = jwtSection["Issuer"] ?? "IdentityService";

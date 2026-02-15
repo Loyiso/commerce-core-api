@@ -6,7 +6,6 @@
 /Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/bin/Debug/net9.0/CartService.API.runtimeconfig.json
 /Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/bin/Debug/net9.0/CartService.API.dll
 /Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/bin/Debug/net9.0/CartService.API.pdb
-/Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/bin/Debug/net9.0/CartService.API.xml
 /Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/bin/Debug/net9.0/Microsoft.EntityFrameworkCore.dll
 /Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/bin/Debug/net9.0/Microsoft.EntityFrameworkCore.Abstractions.dll
 /Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/bin/Debug/net9.0/Microsoft.EntityFrameworkCore.InMemory.dll
@@ -35,7 +34,14 @@
 /Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/obj/Debug/net9.0/CartServ.3A4B8683.Up2Date
 /Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/obj/Debug/net9.0/CartService.API.dll
 /Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/obj/Debug/net9.0/refint/CartService.API.dll
-/Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/obj/Debug/net9.0/CartService.API.xml
 /Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/obj/Debug/net9.0/CartService.API.pdb
 /Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/obj/Debug/net9.0/CartService.API.genruntimeconfig.cache
 /Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/obj/Debug/net9.0/ref/CartService.API.dll
+/Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/bin/Debug/net9.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/bin/Debug/net9.0/Microsoft.IdentityModel.Abstractions.dll
+/Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/bin/Debug/net9.0/Microsoft.IdentityModel.JsonWebTokens.dll
+/Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/bin/Debug/net9.0/Microsoft.IdentityModel.Logging.dll
+/Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/bin/Debug/net9.0/Microsoft.IdentityModel.Protocols.dll
+/Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/bin/Debug/net9.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+/Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/bin/Debug/net9.0/Microsoft.IdentityModel.Tokens.dll
+/Users/loyisonelani/Documents/Development/commerce-core-api/CartService.API/bin/Debug/net9.0/System.IdentityModel.Tokens.Jwt.dll

@@ -5,19 +5,16 @@ using CatalogService.API.Infrastructure.Data;
 using CatalogService.API.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Serilog;
- 
-using Shared.Logging.Dispatch;
-using Shared.Logging.Extensions;
-using Shared.Logging.Serilog;
+using Microsoft.IdentityModel.Tokens; 
 
 var builder = WebApplication.CreateBuilder(args);
- 
-builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning);
-builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
-builder.Logging.AddFilter("Microsoft.AspNetCore.DataProtection", LogLevel.Warning);
- 
+
+builder.Services.AddHttpClient<ILoggingApiClient, LoggingApiClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["LoggingApi:BaseUrl"]!);
+    client.Timeout = TimeSpan.FromSeconds(2);  
+});
+  
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var issuer = jwtSection["Issuer"] ?? "IdentityService";
 var audience = jwtSection["Audience"] ?? "IdentityServiceClients";
@@ -34,22 +31,7 @@ if (isWeakKey && builder.Environment.IsProduction())
 }
  
 builder.Services.AddHttpContextAccessor();
-
-builder.Services.AddSharedInMemoryLogging(databaseName: "CatalogServiceLogsDb");
-
-builder.Host.UseSerilog((ctx, services, lc) =>
-{
-    var dispatcher = services.GetRequiredService<ILogDispatcher>();
-
-    lc.ReadFrom.Configuration(ctx.Configuration)
-      .Enrich.FromLogContext()
-      .WriteTo.Console()
-      .WriteTo.Sink(new FireAndForgetInMemorySink(
-          dispatcher,
-          service: "CatalogService.API",
-          environment: ctx.HostingEnvironment.EnvironmentName));
-});
- 
+  
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
